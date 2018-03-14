@@ -4,17 +4,16 @@ import com.google.common.base.Joiner;
 import com.google.common.cache.Cache;
 import com.google.common.collect.Lists;
 import com.myretail.productapi.models.ProductByTcin;
+import com.myretail.productapi.models.RestProduct;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
 public class ProductByTcinRestService {
@@ -22,29 +21,28 @@ public class ProductByTcinRestService {
     private Cache<Long, ProductByTcin> productByTcinCache;
 
     private RestTemplate restTemplate;
-    private String URL = "http://redsky.target.com/v2/pdp/tcin/{tcins}?excludes=taxonomy,price,promotion,bulk_ship,rating_and_review_reviews,rating_and_review_statistics,question_answer_statistics";
 
-    public ProductByTcinRestService(RestTemplate restTemplate, Cache<Long, ProductByTcin> productByTcinCache){
+    private String url;
+
+    public ProductByTcinRestService(RestTemplate restTemplate, Cache<Long, ProductByTcin> productByTcinCache, String url){
         this.restTemplate = restTemplate;
         this.productByTcinCache = productByTcinCache;
+        this.url=url;
     }
 
-    public Iterable<ProductByTcin> getProductsByTcin(@NotNull Iterable<Long> tcins, boolean useCachedRecords) {
+    public Iterable<ProductByTcin> getProductsByTcin(@NotNull List<Long> tcins, boolean useCachedRecords) {
         if(!useCachedRecords){
             return getProductsByTcin(tcins);
         }
 
         Map<Long, ProductByTcin> availableFromCache = productByTcinCache.getAllPresent(tcins);
-        Iterable<ProductByTcin> availableFromRemote = getProductsByTcin(stream(tcins.spliterator(), true).filter(t -> !availableFromCache.containsKey(t)).collect(toSet()));
-
-        List<ProductByTcin> result = Lists.newLinkedList(availableFromRemote);
-        result.addAll(availableFromCache.values());
-
-        return result;
+        Iterable<ProductByTcin> availableFromRemote = getProductsByTcin(stream(tcins.spliterator(), true).filter(t -> !availableFromCache.containsKey(t)).collect(toList()));
+        
+        return productByTcinCache.getAllPresent(tcins).values();
     }
 
     @HystrixCommand(fallbackMethod = "defaultEmptyProductByTcin")
-    private Iterable<ProductByTcin> getProductsByTcin(@NotNull Iterable<Long> tcins) {
+    private Iterable<ProductByTcin> getProductsByTcin(@NotNull List<Long> tcins) {
         if(!tcins.iterator().hasNext()) {
             return Lists.newLinkedList();
 
@@ -53,19 +51,34 @@ public class ProductByTcinRestService {
         Map<String, String> uriVariables = new LinkedHashMap<>();
         uriVariables.put("tcins", Joiner.on(",").join(tcins));
 
-        ProductByTcin[] productByTcins = restTemplate.getForEntity("http://localhost:8080/products/test/{tcins}", ProductByTcin[].class, uriVariables).getBody();
+
+        List<ProductByTcin> productByTcins = new LinkedList<>();
+
+        if(tcins.size() > 1) {
+            ResponseEntity<RestProduct[]> responseEntity1 = restTemplate.getForEntity(url, RestProduct[].class, uriVariables);
+            productByTcins = Arrays.stream(responseEntity1.getBody()).map(rp -> new ProductByTcin(rp)).collect(Collectors.toList());
+        }
+        if(tcins.size()==1) {
+            ResponseEntity<RestProduct> responseEntity2 = restTemplate.getForEntity(url, RestProduct.class, uriVariables);
+            productByTcins.add(new ProductByTcin(responseEntity2.getBody()));
+        }
 
         writeToCache(productByTcins);
 
         return Lists.newArrayList(productByTcins);
     }
 
-    private void writeToCache(ProductByTcin[] productByTcins) {
-        Arrays.stream(productByTcins).forEach(entry -> productByTcinCache.put(entry.getTcin(), entry));
+    private void writeToCache(List<ProductByTcin> productByTcins) {
+        productByTcins.forEach(entry -> writeToCache(entry));
+    }
+
+    private void writeToCache(ProductByTcin productByTcin) {
+        if(productByTcin.getTcin()!=null) {
+            productByTcinCache.put(productByTcin.getTcin(), productByTcin);
+        }
     }
 
     Iterable<ProductByTcin>  defaultEmptyProductByTcin(@NotNull Iterable<Long> tcins) {
         return Lists.newLinkedList();
-        //return stream(tcins.spliterator(),true).map(t -> new ProductByTcin(t)).collect(toList());
     }
 }

@@ -469,7 +469,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre>| `200 OK`
 | Standard response for successful HTTP GET requests.
-| The actual response will have the requested entity if present.</pre>
+| The actual response will have the requested product data if available.</pre>
 </div>
 </div>
 <div class="literalblock">
@@ -496,7 +496,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="title">Request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /products/12345?includes=product-fetcher,product-price-fetcher HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /products/13860428?includes=product-fetcher,product-price-fetcher HTTP/1.1
 Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
@@ -543,11 +543,11 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 122
+Content-Length: 140
 
 [ {
-  "tcin" : 12345,
-  "title" : "Title_12345",
+  "tcin" : 13860428,
+  "title" : "The Big Lebowski (Blu-ray)",
   "currentPrice" : {
     "value" : 100.99,
     "currency" : "USD"
@@ -607,7 +607,7 @@ Content-Length: 122
 <div class="listingblock">
 <div class="title">Request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /products/12345,92345?includes=product-fetcher,product-price-fetcher HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /products/13860428,16696652?includes=product-fetcher,product-price-fetcher HTTP/1.1
 Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
@@ -654,18 +654,18 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 240
+Content-Length: 279
 
 [ {
-  "tcin" : 12345,
-  "title" : "Title_12345",
+  "tcin" : 13860428,
+  "title" : "The Big Lebowski (Blu-ray)",
   "currentPrice" : {
     "value" : 100.99,
     "currency" : "USD"
   }
 }, {
-  "tcin" : 92345,
-  "title" : "Title_92345",
+  "tcin" : 16696652,
+  "title" : "Beats Solo 2 Wireless - Black",
   "currentPrice" : {
     "value" : 9.99,
     "currency" : "USD"
@@ -725,7 +725,7 @@ Content-Length: 240
 <div class="listingblock">
 <div class="title">Request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /products/12345,92345?includes=product-fetcher HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /products/13860428,16696652?includes=product-fetcher HTTP/1.1
 Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
@@ -772,14 +772,14 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 100
+Content-Length: 139
 
 [ {
-  "tcin" : 12345,
-  "title" : "Title_12345"
+  "tcin" : 13860428,
+  "title" : "The Big Lebowski (Blu-ray)"
 }, {
-  "tcin" : 92345,
-  "title" : "Title_92345"
+  "tcin" : 16696652,
+  "title" : "Beats Solo 2 Wireless - Black"
 } ]</code></pre>
 </div>
 </div>
@@ -820,7 +820,7 @@ Content-Length: 100
 <div class="listingblock">
 <div class="title">Request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /products/12345 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /products/13860428 HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 Host: localhost:8080
@@ -896,7 +896,7 @@ Content-Length: 73
 <div class="listingblock">
 <div class="title">Request</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /products/12345 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">PUT /products/13860428 HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 Host: localhost:8080
@@ -964,7 +964,7 @@ Content-Length: 49
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
 Content-Type: application/json;charset=UTF-8
-Content-Length: 213
+Content-Length: 216
 
 {
   "errorsDTO" : {
@@ -975,7 +975,7 @@ Content-Length: 213
       "moreInfo" : "currency_price.currency is null"
     } ]
   },
-  "tcin" : 12345
+  "tcin" : 13860428
 }</code></pre>
 </div>
 </div>
@@ -1037,7 +1037,7 @@ Content-Length: 213
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-14 03:57:57 PDT
+Last updated 2018-03-14 03:58:41 PDT
 </div>
 </div>
 </body>

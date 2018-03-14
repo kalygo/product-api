@@ -31,5 +31,6 @@ a) Use command -
 <br>
 java -jar -Dcassandra.contactpoints=localhost -Dcassandra.port=9042 -Dspring.profiles.active=dev target/product-api-0.0.1-SNAPSHOT.jar
 <br>
-b) The API documentation will be available at http://{hostname}:8081/docs/index.html
+b) The API documentation will be available at http://{hostname}:8081/docs/index.html 
+Or Please download https://github.com/kalygo/product-api/blob/master/index.html and open in a web browser
 

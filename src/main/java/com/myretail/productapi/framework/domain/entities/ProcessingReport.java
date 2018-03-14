@@ -3,9 +3,7 @@ package com.myretail.productapi.framework.domain.entities;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.myretail.productapi.framework.domain.entities.ProcessingReport.EventCode.CODE_1000;
-import static com.myretail.productapi.framework.domain.entities.ProcessingReport.EventCode.CODE_1001;
-import static com.myretail.productapi.framework.domain.entities.ProcessingReport.EventCode.CODE_1002;
+import static com.myretail.productapi.framework.domain.entities.ProcessingReport.EventCode.*;
 import static com.myretail.productapi.framework.domain.entities.ProcessingReport.EventType.ERROR;
 import static com.myretail.productapi.framework.domain.entities.ProcessingReport.EventType.WARN;
 
@@ -28,7 +26,8 @@ public class ProcessingReport {
 
         CODE_1000,
         CODE_1001,
-        CODE_1002
+        CODE_1002,
+        CODE_1003
         ;
 
     }
@@ -36,7 +35,8 @@ public class ProcessingReport {
     public enum Event {
         ERR_PRODUCT_DATA_NOT_AVAILABLE(ERROR, CODE_1000),
         WARN_PRODUCT_PRICE_DATA_NOT_AVAILABLE(WARN, CODE_1001),
-        VALIDATION_ERROR(ERROR, CODE_1002)
+        VALIDATION_ERROR(ERROR, CODE_1002),
+        ERROR_WHILE_PROCESSING_REQUEST(ERROR, CODE_1003)
         ;
 
         private EventType eventType;

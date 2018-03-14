@@ -5,7 +5,6 @@ import com.myretail.productapi.framework.convertors.Convertor;
 import com.myretail.productapi.framework.exceptions.XRuntimeException;
 import com.myretail.productapi.framework.fetchers.CombinedFetcher;
 import com.myretail.productapi.framework.fetchers.Fetcher;
-import com.myretail.productapi.framework.validators.Validator;
 
 import java.util.Map;
 import java.util.Set;

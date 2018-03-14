@@ -25,7 +25,7 @@ public class ProductByTcinFetcherTest {
 
         ProductByTcin p123 = new ProductByTcin(123l);
 
-        when(productByTcinRestService.getProductsByTcin(newArrayList(123L))).thenReturn(newArrayList(p123));
+        when(productByTcinRestService.getProductsByTcin(newArrayList(123L), true)).thenReturn(newArrayList(p123));
 
         Map<Long, ProductByTcin> actual = fetcherUnderTest.fetchData(newArrayList(123L));
 
@@ -40,7 +40,7 @@ public class ProductByTcinFetcherTest {
         fetcherUnderTest = new ProductByTcinFetcher(productByTcinRestService, productByTcinToProductMapper);
 
         ProductByTcin p123 = new ProductByTcin(123l);
-        when(productByTcinRestService.getProductsByTcin(newArrayList(123L))).thenReturn(Lists.newArrayList(p123));
+        when(productByTcinRestService.getProductsByTcin(newArrayList(123L), true)).thenReturn(Lists.newArrayList(p123));
 
         Map<Long, ProductByTcin> actual = fetcherUnderTest.fetchData(newArrayList(123L));
 

@@ -11,7 +11,7 @@ import java.util.Map;
 import static com.myretail.productapi.framework.domain.entities.ProcessingReport.Event.ERR_PRODUCT_DATA_NOT_AVAILABLE;
 
 
-public final class ProductByTcinFetcher implements Fetcher<Long, ProductByTcin> {
+public class ProductByTcinFetcher implements Fetcher<Long, ProductByTcin> {
 
     private ProductByTcinRestService productByTcinRestService;
     private EntityMapper entityMapper;

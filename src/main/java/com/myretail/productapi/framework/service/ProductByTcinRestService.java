@@ -2,33 +2,31 @@ package com.myretail.productapi.framework.service;
 
 import com.google.common.base.Joiner;
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.myretail.productapi.models.ProductByTcin;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.StreamSupport.stream;
 
 public class ProductByTcinRestService {
 
-    @Autowired
-    Cache<Long, ProductByTcin> productByTcinCache;
+    private Cache<Long, ProductByTcin> productByTcinCache;
 
     private RestTemplate restTemplate;
     private String URL = "http://redsky.target.com/v2/pdp/tcin/{tcins}?excludes=taxonomy,price,promotion,bulk_ship,rating_and_review_reviews,rating_and_review_statistics,question_answer_statistics";
 
-    public ProductByTcinRestService(RestTemplate restTemplate){
+    public ProductByTcinRestService(RestTemplate restTemplate, Cache<Long, ProductByTcin> productByTcinCache){
         this.restTemplate = restTemplate;
+        this.productByTcinCache = productByTcinCache;
     }
 
     public Iterable<ProductByTcin> getProductsByTcin(@NotNull Iterable<Long> tcins, boolean useCachedRecords) {
@@ -46,7 +44,7 @@ public class ProductByTcinRestService {
     }
 
     @HystrixCommand(fallbackMethod = "defaultEmptyProductByTcin")
-    public Iterable<ProductByTcin> getProductsByTcin(@NotNull Iterable<Long> tcins) {
+    private Iterable<ProductByTcin> getProductsByTcin(@NotNull Iterable<Long> tcins) {
         if(!tcins.iterator().hasNext()) {
             return Lists.newLinkedList();
 

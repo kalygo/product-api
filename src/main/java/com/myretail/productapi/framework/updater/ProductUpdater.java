@@ -5,7 +5,6 @@ import com.myretail.productapi.framework.domain.entities.Product;
 import com.myretail.productapi.framework.persisters.CombinedPersister;
 import com.myretail.productapi.framework.validators.Validator;
 import com.myretail.productapi.rest.dto.ErrorsDTO;
-import com.myretail.productapi.rest.dto.PriceDTO;
 import com.myretail.productapi.rest.dto.ProductDTO;
 import org.apache.commons.lang3.tuple.Pair;
 

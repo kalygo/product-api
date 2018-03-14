@@ -13,6 +13,7 @@ import com.myretail.productapi.framework.updater.UpdaterFactory;
 import com.myretail.productapi.models.ProductByTcin;
 import com.myretail.productapi.rest.dto.ErrorsDTO;
 import com.myretail.productapi.rest.dto.ProductDTO;
+import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.math.NumberUtils.createLong;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
@@ -31,16 +33,20 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 @RequestMapping(value = "/products")
 public class ProductController {
 
-    @Autowired
     private Map<String, Fetcher> fetchersByName;
-
-    @Autowired
     private Map<String, Persister> persistersByName;
+    private ProducerFactory producerFactory;
+    private UpdaterFactory updaterFactory;
 
     @Autowired
-    private ProducerFactory producerFactory;
+    public ProductController(Map<String, Fetcher> fetchersByName, Map<String, Persister> persistersByName, ProducerFactory producerFactory,UpdaterFactory updaterFactory){
+        this.fetchersByName=fetchersByName;
+        this.persistersByName=persistersByName;
+        this.producerFactory=producerFactory;
+        this.updaterFactory=updaterFactory;
+    }
 
-    @RequestMapping(value = "/{tcins}", method = GET)
+    @RequestMapping(value = "/{tcins}", method = GET, produces = "application/json")
     @ResponseBody
     public Iterable<ProductDTO> getProduct(@PathVariable(value = "tcins") String tcins, @RequestParam(value = "includes", required = false, defaultValue = "product-fetcher") String fetcherNames) throws XRuntimeException {
 
@@ -59,16 +65,16 @@ public class ProductController {
     }
 
 
-    @RequestMapping(value = "/{tcin}", method = PUT)
+    @RequestMapping(value = "/{tcin}", method = PUT, consumes = "application/json")
     public ResponseEntity updateProduct(@PathVariable(value = "tcin") Long tcin, @RequestBody ProductDTO productDTO){
 
-        ProductUpdater updater = UpdaterFactory.newProductUpdater(tcin, productDTO, productPersisters());
+        ProductUpdater updater = updaterFactory.newProductUpdater(tcin, productDTO, productPersisters());
 
         ErrorsDTO errorsOnUpdate = updater.update();
         if(errorsOnUpdate.hasErrors()) {
             return ResponseEntity.badRequest().body(new ProductDTO(tcin, errorsOnUpdate));
         } else {
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         }
     }
 
@@ -88,7 +94,6 @@ public class ProductController {
                 .splitToList(tcins).parallelStream()
                 .map(s -> createDummyProduct(createLong(s)))
                 .collect(Collectors.toList());
-        //collect.remove(0);
         return collect.stream().toArray(size -> new ProductByTcin[size]);
 
     }

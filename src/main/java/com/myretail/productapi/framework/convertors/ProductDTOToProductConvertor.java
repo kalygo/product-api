@@ -20,9 +20,7 @@ public class ProductDTOToProductConvertor implements Convertor<ProductDTO, Produ
     }
 
     private void convertPrimaryData(ProductDTO source, Product target) {
-        if(source.getTcin()!=null) {
-            target.setTcin(NumberUtils.createLong(source.getTcin()));
-        }
+        target.setTcin(source.getTcin());
         target.setName(source.getTitle());
     }
 

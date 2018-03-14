@@ -24,6 +24,7 @@ public class ProductByTcinFetcherTest {
         fetcherUnderTest = new ProductByTcinFetcher(productByTcinRestService, productByTcinToProductMapper);
 
         ProductByTcin p123 = new ProductByTcin(123l);
+        p123.setTcin(123l);
 
         when(productByTcinRestService.getProductsByTcin(newArrayList(123L), true)).thenReturn(newArrayList(p123));
 
@@ -35,18 +36,15 @@ public class ProductByTcinFetcherTest {
     }
 
     @Test
-    public void fetchData_withInvalidTcin_shouldReturnEmptyProductWithId() throws Exception {
+    public void fetchData_withInvalidTcin_shouldReturnNothing() throws Exception {
         productByTcinRestService = mock(ProductByTcinRestService.class);
         fetcherUnderTest = new ProductByTcinFetcher(productByTcinRestService, productByTcinToProductMapper);
 
-        ProductByTcin p123 = new ProductByTcin(123l);
-        when(productByTcinRestService.getProductsByTcin(newArrayList(123L), true)).thenReturn(Lists.newArrayList(p123));
+        when(productByTcinRestService.getProductsByTcin(newArrayList(123L), true)).thenReturn(Lists.newArrayList());
 
         Map<Long, ProductByTcin> actual = fetcherUnderTest.fetchData(newArrayList(123L));
 
-        assertEquals(1, actual.size());
-        assertEquals(123L, actual.keySet().iterator().next().longValue());
-        assertEquals(p123, actual.get(123L));
+        assertEquals(0, actual.size());
 
     }
 }

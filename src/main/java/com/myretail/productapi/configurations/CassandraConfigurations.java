@@ -12,13 +12,22 @@ import com.datastax.driver.mapping.annotations.Query;
 import com.myretail.productapi.models.ProductPriceByTcin;
 import com.myretail.productapi.models.Status;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.annotation.PreDestroy;
 
 @Configuration
+@Profile(value = {"dev","prod"})
 public class CassandraConfigurations {
+
+    @Value("${cassandra.contactpoints}")
+    public String cassandraContactpoints;
+
+    @Value("${cassandra.port}")
+    public Integer cassandraPort;
 
     @Autowired
     private Cluster cluster;
@@ -36,7 +45,7 @@ public class CassandraConfigurations {
 
     @Bean
     public Cluster cluster(){
-        Cluster cluster = Cluster.builder().addContactPoint("localhost").withPort(9042)
+        Cluster cluster = Cluster.builder().addContactPoint(cassandraContactpoints).withPort(cassandraPort)
                 .build();
         cluster.getConfiguration().getCodecRegistry()
                 .register(new EnumNameCodec<Status>(Status.class));
@@ -44,6 +53,8 @@ public class CassandraConfigurations {
         return cluster;
 
     }
+
+
 
     @PreDestroy
     public void close(){

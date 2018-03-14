@@ -1,7 +1,10 @@
 package com.myretail.productapi.rest.controllers;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.mapping.Mapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.myretail.productapi.configurations.CassandraConfigurations;
 import com.myretail.productapi.framework.domain.entities.ProcessingReport;
 import com.myretail.productapi.framework.domain.entities.Product;
 import com.myretail.productapi.framework.fetchers.Fetcher;
@@ -13,22 +16,30 @@ import com.myretail.productapi.framework.producers.ProducerFactory;
 import com.myretail.productapi.framework.updater.ProductUpdater;
 import com.myretail.productapi.framework.updater.Updater;
 import com.myretail.productapi.framework.updater.UpdaterFactory;
+import com.myretail.productapi.models.ProductPriceByTcin;
 import com.myretail.productapi.rest.dto.ErrorDTO;
 import com.myretail.productapi.rest.dto.ErrorsDTO;
 import com.myretail.productapi.rest.dto.ProductDTO;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.request.ParameterDescriptor;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -58,13 +69,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ActiveProfiles("test")
 public class ProductControllerTest {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("target/generated-snippets");
 
+    @MockBean
+    public Mapper<ProductPriceByTcin> productPriceByTcinDatastaxMapper;
+
+    @MockBean
+    public CassandraConfigurations.ProductPriceByTcinAccessor productPriceByTcinAccessor;
+
     @Autowired
     private WebApplicationContext context;
     private MockMvc mockMvc;
+
     @MockBean
     private Map<String, Fetcher> fetchersByName;
     @MockBean
@@ -116,11 +135,11 @@ public class ProductControllerTest {
     public void getProductDataWithPrice() throws Exception{
         when(producerFactory.newProductProducer(any(Set.class), any(Set.class))).thenReturn(mockProducer);
 
-        ProductDTO response1 = ProductsFactory.getProductWithPrice(12345l, "Title_12345", BigDecimal.valueOf(100.99));
+        ProductDTO response1 = ProductsFactory.getProductWithPrice(13860428l, "The Big Lebowski (Blu-ray)", BigDecimal.valueOf(100.99));
         when(mockProducer.produce()).thenReturn(Lists.newArrayList(response1));
 
         this.mockMvc
-                .perform(get("/products/{tcins}?includes=product-fetcher,product-price-fetcher", 12345).accept(APPLICATION_JSON))
+                .perform(get("/products/{tcins}?includes=product-fetcher,product-price-fetcher", 13860428).accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         pathParameters(PATH_PARAM_STRING_TCINS),
@@ -134,12 +153,12 @@ public class ProductControllerTest {
     public void getProductsDataWithPrice() throws Exception{
         when(producerFactory.newProductProducer(any(Set.class), any(Set.class))).thenReturn(mockProducer);
 
-        ProductDTO response1 = ProductsFactory.getProductWithPrice(12345l, "Title_12345", BigDecimal.valueOf(100.99));
-        ProductDTO response2 = ProductsFactory.getProductWithPrice(92345l, "Title_92345", BigDecimal.valueOf(9.99));
+        ProductDTO response1 = ProductsFactory.getProductWithPrice(13860428l, "The Big Lebowski (Blu-ray)", BigDecimal.valueOf(100.99));
+        ProductDTO response2 = ProductsFactory.getProductWithPrice(16696652l, "Beats Solo 2 Wireless - Black", BigDecimal.valueOf(9.99));
         when(mockProducer.produce()).thenReturn(Lists.newArrayList(response1, response2));
 
         this.mockMvc
-                .perform(get("/products/{tcins}?includes=product-fetcher,product-price-fetcher", "12345,92345").accept(APPLICATION_JSON))
+                .perform(get("/products/{tcins}?includes=product-fetcher,product-price-fetcher", "13860428,16696652").accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         pathParameters(PATH_PARAM_STRING_TCINS),
@@ -158,12 +177,12 @@ public class ProductControllerTest {
     public void getProductsDataWithoutPrice() throws Exception{
         when(producerFactory.newProductProducer(any(Set.class), any(Set.class))).thenReturn(mockProducer);
 
-        ProductDTO response1 = ProductsFactory.getProductWithoutPrice(12345l, "Title_12345");
-        ProductDTO response2 = ProductsFactory.getProductWithoutPrice(92345l, "Title_92345");
+        ProductDTO response1 = ProductsFactory.getProductWithoutPrice(13860428l, "The Big Lebowski (Blu-ray)");
+        ProductDTO response2 = ProductsFactory.getProductWithoutPrice(16696652l, "Beats Solo 2 Wireless - Black");
         when(mockProducer.produce()).thenReturn(Lists.newArrayList(response1, response2));
 
         this.mockMvc
-                .perform(get("/products/{tcins}?includes=product-fetcher","12345,92345").accept(APPLICATION_JSON))
+                .perform(get("/products/{tcins}?includes=product-fetcher","13860428,16696652").accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         pathParameters(PATH_PARAM_STRING_TCINS),
@@ -181,7 +200,7 @@ public class ProductControllerTest {
         ProductDTO request = ProductsFactory.getProductWithPrice(BigDecimal.valueOf(100.99));
 
         this.mockMvc
-                .perform(put("/products/{tcin}",12345).accept(APPLICATION_JSON)
+                .perform(put("/products/{tcin}",13860428).accept(APPLICATION_JSON)
                         .contentType(APPLICATION_JSON)
                         .content(this.objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNoContent())
@@ -202,11 +221,10 @@ public class ProductControllerTest {
         when(updaterFactory.newProductUpdater(anyLong(), any(ProductDTO.class), any())).thenReturn(mockUpdater);
         when(mockUpdater.update()).thenReturn(errorsDTO);
         this.mockMvc
-                .perform(put("/products/{tcin}",12345).accept(APPLICATION_JSON)
+                .perform(put("/products/{tcin}",13860428).accept(APPLICATION_JSON)
                         .contentType(APPLICATION_JSON)
                         .content(this.objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andDo(print())
                 .andDo(document("{method-name}", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         pathParameters(PATH_PARAM_LONG_TCIN),
                         requestFields(NEW_PRICE_OF_THE_PRODUCT,DECIMAL_VALUE_OF_THE_NEW_PRICE,CURRENCY_FOR_THE_NEW_PRICE.optional().type(STRING)),

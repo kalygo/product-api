@@ -7,18 +7,24 @@ import com.myretail.productapi.framework.fetchers.ProductPriceByTcinFetcher;
 import com.myretail.productapi.framework.service.ProductByTcinRestService;
 import com.myretail.productapi.models.ProductByTcin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.util.concurrent.TimeUnit;
 
 import static com.myretail.productapi.configurations.CassandraConfigurations.ProductPriceByTcinAccessor;
 
 @Configuration
+@Profile(value = {"dev","prod"})
 public class FetcherConfigurations {
     @Autowired
     private Cache<Long, ProductByTcin> productByTcinCache;
+
+    @Value("${external.productapi.url}")
+    public String externalProductApiURL;
 
     @Autowired
     private ProductByTcinFetcher.DefaultMapper productByTcinFetcherDefaultMapper;
@@ -46,7 +52,7 @@ public class FetcherConfigurations {
 
     @Bean
     public ProductByTcinRestService productByTcinRestService(RestTemplateBuilder builder){
-        return new ProductByTcinRestService(builder.build(), productByTcinCache);
+        return new ProductByTcinRestService(builder.build(), productByTcinCache, externalProductApiURL);
     }
 
     @Bean

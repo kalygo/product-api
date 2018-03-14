@@ -1,5 +1,6 @@
 package com.myretail.productapi.framework.fetchers;
 
+import com.google.common.collect.Lists;
 import com.myretail.productapi.framework.domain.entities.Product;
 import com.myretail.productapi.framework.service.ProductByTcinRestService;
 import com.myretail.productapi.models.ProductByTcin;
@@ -30,7 +31,7 @@ public class ProductByTcinFetcher implements Fetcher<Long, ProductByTcin> {
     public Map<Long, ProductByTcin> fetchData(Iterable<Long> tcins) {
         Map<Long, ProductByTcin> resultset = new LinkedHashMap<>();
         if(null!=tcins) {
-            Iterable<ProductByTcin> products = productByTcinRestService.getProductsByTcin(tcins, true);
+            Iterable<ProductByTcin> products = productByTcinRestService.getProductsByTcin(Lists.newArrayList(tcins), true);
 
             for (ProductByTcin pr : products) {
                 if(null!=pr) {

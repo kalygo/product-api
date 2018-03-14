@@ -24,4 +24,5 @@ e) Run {cassandra installation dir}/bin/cqlsh -f product-api/src/main/resources/
 a) Use command -
 java -jar -Dcassandra.contactpoints=localhost -Dcassandra.port=9042 -Dspring.profiles.active=dev target/product-api-0.0.1-SNAPSHOT.jar
 
-b) 
+b) The API documentation will be available at http://{hostname}:8081/docs/index.html
+

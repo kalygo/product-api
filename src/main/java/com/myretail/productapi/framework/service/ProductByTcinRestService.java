@@ -6,7 +6,9 @@ import com.google.common.collect.Lists;
 import com.myretail.productapi.models.ProductByTcin;
 import com.myretail.productapi.models.RestProduct;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
@@ -37,7 +39,7 @@ public class ProductByTcinRestService {
 
         Map<Long, ProductByTcin> availableFromCache = productByTcinCache.getAllPresent(tcins);
         Iterable<ProductByTcin> availableFromRemote = getProductsByTcin(stream(tcins.spliterator(), true).filter(t -> !availableFromCache.containsKey(t)).collect(toList()));
-        
+
         return productByTcinCache.getAllPresent(tcins).values();
     }
 
@@ -53,14 +55,20 @@ public class ProductByTcinRestService {
 
 
         List<ProductByTcin> productByTcins = new LinkedList<>();
+        try {
+            if (tcins.size() > 1) {
+                ResponseEntity<RestProduct[]> responseEntity1 = restTemplate.getForEntity(url, RestProduct[].class, uriVariables);
+                productByTcins = Arrays.stream(responseEntity1.getBody()).map(rp -> new ProductByTcin(rp)).collect(Collectors.toList());
+            }
+            if (tcins.size() == 1) {
+                ResponseEntity<RestProduct> responseEntity2 = restTemplate.getForEntity(url, RestProduct.class, uriVariables);
+                productByTcins.add(new ProductByTcin(responseEntity2.getBody()));
+            }
 
-        if(tcins.size() > 1) {
-            ResponseEntity<RestProduct[]> responseEntity1 = restTemplate.getForEntity(url, RestProduct[].class, uriVariables);
-            productByTcins = Arrays.stream(responseEntity1.getBody()).map(rp -> new ProductByTcin(rp)).collect(Collectors.toList());
-        }
-        if(tcins.size()==1) {
-            ResponseEntity<RestProduct> responseEntity2 = restTemplate.getForEntity(url, RestProduct.class, uriVariables);
-            productByTcins.add(new ProductByTcin(responseEntity2.getBody()));
+        } catch (HttpClientErrorException httpClientExcpetion)   {
+            if (httpClientExcpetion.getStatusCode() != HttpStatus.NOT_FOUND) {
+                throw httpClientExcpetion;
+            }
         }
 
         writeToCache(productByTcins);

@@ -14,11 +14,7 @@ public class ProductValidator implements Validator<Pair<Pair<Long, ProductDTO>, 
         ErrorsDTO errorsDTO = inputDataAndErrorsDTOPair.getValue();
 
         ProductDTO productDTO = inputDataAndErrorsDTOPair.getKey().getValue();
-        if(null!=productDTO){
-            if(productDTO.getTcin()!=null && (!NumberUtils.isDigits(productDTO.getTcin()) || Long.valueOf(productDTO.getTcin()) > 999999999L)){
-                errorsDTO.addError(new ErrorDTO(ProcessingReport.Event.VALIDATION_ERROR, "tcin:"+productDTO.getTcin()+" should be a number equal to or less than 999999999"));
-            }
-        }
+        //TODO: Validation to be done for product validity
 
         return ! errorsDTO.hasErrors();
     }

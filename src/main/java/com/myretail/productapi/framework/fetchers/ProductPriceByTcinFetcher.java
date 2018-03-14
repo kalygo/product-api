@@ -16,7 +16,7 @@ import static com.myretail.productapi.framework.domain.entities.BaseEntity.Statu
 import static com.myretail.productapi.framework.domain.entities.BaseEntity.Status.DELETED;
 import static com.myretail.productapi.framework.domain.entities.ProcessingReport.Event.WARN_PRODUCT_PRICE_DATA_NOT_AVAILABLE;
 
-public final class ProductPriceByTcinFetcher implements Fetcher<Long, ProductPriceByTcin> {
+public class ProductPriceByTcinFetcher implements Fetcher<Long, ProductPriceByTcin> {
 
     private ProductPriceByTcinAccessor productPriceByTcinAccessor;
     private EntityMapper entityMapper;

@@ -1,0 +1,93 @@
+= Product API microservice documentation
+
+  [[overview-http-verbs]]
+  == HTTP verbs used -
+  |===
+  | Verb | Usage
+
+  | `GET`
+  | Used to retrieve details of one or more products
+
+  | `PUT`
+  | Used to update product details
+  |===
+
+  [[overview-http-status-codes]]
+  == HTTP status codes
+
+  |===
+  | Status code | Usage
+
+  | `200 OK`
+  | Standard response for successful HTTP GET requests.
+  | The actual response will have the requested product data if available.
+
+  | `204 No Content`
+  | The product detail was updated and there is no content to be returned.
+
+  | `400 Bad Request`
+  | This used to denote the errors on the client request
+
+  |===
+
+=== Retrieve product-data with price for a single product-id
+
+.Request
+include::{snippets}/get-product-data-with-price/http-request.adoc[]
+include::{snippets}/get-product-data-with-price/path-parameters.adoc[]
+include::{snippets}/get-product-data-with-price/request-parameters.adoc[]
+
+.Response
+include::{snippets}/get-product-data-with-price/http-response.adoc[]
+include::{snippets}/get-product-data-with-price/response-fields.adoc[]
+
+
+=== Retrieve product-data with price for comma-separated product-ids
+
+.Request
+include::{snippets}/get-products-data-with-price/http-request.adoc[]
+include::{snippets}/get-products-data-with-price/path-parameters.adoc[]
+include::{snippets}/get-products-data-with-price/request-parameters.adoc[]
+
+.Response
+include::{snippets}/get-products-data-with-price/http-response.adoc[]
+include::{snippets}/get-products-data-with-price/response-fields.adoc[]
+
+
+=== Retrieve product-data without price for comma-separated product-ids
+
+.Request
+include::{snippets}/get-products-data-without-price/http-request.adoc[]
+include::{snippets}/get-products-data-without-price/path-parameters.adoc[]
+include::{snippets}/get-products-data-without-price/request-parameters.adoc[]
+
+.Response
+include::{snippets}/get-products-data-without-price/http-response.adoc[]
+include::{snippets}/get-products-data-without-price/response-fields.adoc[]
+
+
+
+=== Update price for a single product-id
+
+.Request
+include::{snippets}/put-product-data-with-price/http-request.adoc[]
+include::{snippets}/put-product-data-with-price/path-parameters.adoc[]
+include::{snippets}/put-product-data-with-price/request-fields.adoc[]
+
+.Response
+include::{snippets}/put-product-data-with-price/http-response.adoc[]
+
+=== Update price for a single product-id with Validation error response (Missing Currency field)
+
+.Request
+include::{snippets}/put-product-data-with-price-bad-request/http-request.adoc[]
+include::{snippets}/put-product-data-with-price-bad-request/path-parameters.adoc[]
+include::{snippets}/put-product-data-with-price-bad-request/request-fields.adoc[]
+
+.Response
+include::{snippets}/put-product-data-with-price-bad-request/http-response.adoc[]
+include::{snippets}/put-product-data-with-price-bad-request/response-fields.adoc[]
+
+
+Thank you!
+

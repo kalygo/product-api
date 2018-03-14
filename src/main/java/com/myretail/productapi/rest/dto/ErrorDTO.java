@@ -1,7 +1,9 @@
 package com.myretail.productapi.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.myretail.productapi.framework.domain.entities.ProcessingReport.Event;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorDTO {
     private String type;
     private String code;

@@ -2,10 +2,12 @@ package com.myretail.productapi.rest.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class BaseDTO {
 
     private ErrorsDTO errorsDTO = null;
